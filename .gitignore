@@ -105,3 +105,12 @@ XcodeConfig/DevelopmentTeam.xcconfig
 
 # Other
 .idea
+
+# nilumio: local tooling and signing material that must never be committed
+.claude/
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+AuthKey_*

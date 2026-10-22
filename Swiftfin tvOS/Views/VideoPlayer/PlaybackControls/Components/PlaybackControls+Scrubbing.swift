@@ -100,6 +100,7 @@ extension VideoPlayer.PlaybackControls {
 
         let work = DispatchWorkItem { [weak manager, weak viewState] in
             let totalDuration = interval * jumpCount
+            if SyncPlayManager.shared.requestSeek((manager?.seconds ?? .zero) + (direction == .forward ? totalDuration : .zero - totalDuration), manager: manager) { viewState?.jumpProgressObserver.reset(); return } // nilumio
 
             switch direction {
             case .forward:

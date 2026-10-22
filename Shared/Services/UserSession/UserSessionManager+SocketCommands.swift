@@ -185,7 +185,7 @@ extension UserSessionManager {
     }
 
     @MainActor
-    private func playItem(
+    func playItem( // nilumio: nicht mehr private, SyncPlay startet darüber das Gruppen-Item
         id: String,
         mediaSourceID: String? = nil,
         startPositionTicks: Int? = nil,

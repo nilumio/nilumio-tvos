@@ -21,6 +21,8 @@ dem freien Jellyfin-Client der Jellyfin-Community.
 |---|---|
 | `Shared/Nilumio/Nilumio.swift` | Farben (Türkis #22ABD8, Lila #4B3DB8, Grund #070A12), Herkunftshinweis für „Über“ |
 | `Shared/Nilumio/NilumioIntro.swift` | Start-Animation (Video, weiche Überblendung) |
+| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | „Gemeinsam schauen“ (Jellyfin SyncPlay): Gruppe, Zeitabgleich, Serverbefehle im Player |
+| `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | Seite und Menüpunkt „Gemeinsam schauen“ |
 | `Swiftfin tvOS/Resources/nilumio-intro.mp4` | Intro-Video |
 | `Swiftfin tvOS/Resources/Assets.xcassets/LaunchScreenBackground.colorset` | Startbildschirm-Farbe #070A12 |
 | `Translations/en-GB.lproj/Localizable.strings` | britische Schreibweise (colour, favourite, licence …) |
@@ -51,7 +53,21 @@ Jede Änderung im Code ist mit `// nilumio` markiert.
 | `Swiftfin tvOS/Components/ColorPicker/ColorPickerDefaults.swift` | Farbvorgabe heißt „nilumio“ statt „Jellyfin“ |
 | `Swiftfin tvOS/Resources/Assets.xcassets/App Icon & Top Shelf Image.brandassets/**` | App-Icon (Ebenen) und Top-Shelf-Bilder ersetzt |
 | `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/*` | Jellyfin-Logo durch nilumio-Zeichen ersetzt (Asset-Name bleibt) |
+| `Shared/Coordinators/Tabs/MainTabView.swift` | Menüpunkt „Gemeinsam schauen“ (tvOS) |
+| `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift` | `playItem` nicht mehr `private` (SyncPlay startet darüber das Gruppen-Item) |
+| `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | Play/Pause der Fernbedienung über `nilumioSetPlayback` (in einer Gruppe Anfrage an den Server) |
+| `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | Spulen (Scrubben) in einer Gruppe als Anfrage an den Server |
+| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | Vor-/Zurückspringen in einer Gruppe als Anfrage an den Server |
 | `README.md` | nilumio-Abschnitt oben |
+
+## SyncPlay („Gemeinsam schauen“) und Lizenz
+
+Swiftfin hat kein SyncPlay (Issue jellyfin/Swiftfin#688). Die Umsetzung in `Shared/Nilumio/SyncPlay/`
+ist neu geschrieben nach der öffentlichen Jellyfin-API (OpenAPI: `/SyncPlay/*`, `/GetUtcTime`,
+WebSocket-Nachrichten `SyncPlayCommand`/`SyncPlayGroupUpdate`) und nutzt Endpunkte, Datentypen und
+WebSocket aus jellyfin-sdk-swift (MPL-2.0) bzw. Swiftfins `ServerSocketManager`. Es ist kein Code aus
+jellyfin-web (GPL-2.0) oder aus der Android-Umsetzung (wholphin-fork) übernommen; der Zeitabgleich ist das
+allgemein bekannte NTP-Verfahren. Die Dateien stehen deshalb unter der MPL-2.0.
 
 Prüfen: `git diff --stat 04e0aa10..nilumio`
 

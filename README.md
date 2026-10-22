@@ -24,6 +24,13 @@ Auf einem echten Apple TV: In Xcode das Schema „Swiftfin tvOS“ öffnen, unte
 Signing & Capabilities das eigene Team wählen (oder `XcodeConfig/DevelopmentTeam.xcconfig`
 mit `DEVELOPMENT_TEAM = …` anlegen, steht in `.gitignore`) und das gekoppelte Apple TV als Ziel nehmen.
 
+## Gemeinsam schauen (SyncPlay)
+
+Menüpunkt „Gemeinsam schauen“: Gruppe anlegen oder beitreten (auch gemeinsam mit Jellyfin-Web, Android usw.).
+In einer Gruppe gehen Pause, Weiter und Spulen als Anfrage an den Server; ausgeführt wird der Befehl des
+Servers auf allen Geräten zur selben Serverzeit. Wer in der Gruppe etwas startet, gibt es allen vor.
+Voraussetzung: SyncPlay ist für den Benutzer auf dem Server erlaubt.
+
 Upstream einspielen: `git fetch upstream --tags && git merge <neues-release-tag>`.
 Eigener Code liegt in `Shared/Nilumio/`, Eingriffe in Swiftfin-Dateien sind mit `// nilumio` markiert.
 

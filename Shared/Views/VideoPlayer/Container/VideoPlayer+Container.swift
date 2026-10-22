@@ -987,15 +987,15 @@ extension VideoPlayer {
 
             if viewState.presentation == .hidden {
                 if manager.playbackRequestStatus == .paused {
-                    manager.setPlaybackRequestStatus(status: .playing)
+                    manager.nilumioSetPlayback(.playing) // nilumio
                 }
                 viewState.showControls()
             } else {
                 switch manager.playbackRequestStatus {
                 case .playing:
-                    manager.setPlaybackRequestStatus(status: .paused)
+                    manager.nilumioSetPlayback(.paused) // nilumio
                 case .paused:
-                    manager.setPlaybackRequestStatus(status: .playing)
+                    manager.nilumioSetPlayback(.playing) // nilumio
                 }
             }
 
@@ -1018,9 +1018,9 @@ extension VideoPlayer {
             } else if viewState.isProgressBarFocused {
                 switch manager.playbackRequestStatus {
                 case .playing:
-                    manager.setPlaybackRequestStatus(status: .paused)
+                    manager.nilumioSetPlayback(.paused) // nilumio
                 case .paused:
-                    manager.setPlaybackRequestStatus(status: .playing)
+                    manager.nilumioSetPlayback(.playing) // nilumio
                 }
                 viewState.refreshAutoDismiss()
             } else {

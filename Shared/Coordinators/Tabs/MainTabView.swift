@@ -51,6 +51,7 @@ struct MainTabView: View {
             )
             TabItem.search
             TabItem.media
+            TabItem.syncPlay // nilumio
             TabItem.settings
         }
         #endif

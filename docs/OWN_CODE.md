@@ -12,19 +12,18 @@ counted. Binary files (images, video) are counted as files only.
 
 | Category | New own files | Lines in new files | Upstream files touched | Lines added there | Lines removed there |
 |---|---:|---:|---:|---:|---:|
-| code | 3 | 260 | 11 | 16 | 5 |
+| code | 5 | 627 | 16 | 25 | 11 |
 | build and configuration | 0 | 0 | 3 | 11 | 2 |
 | UI texts and translations | 1 | 28 | 0 | 0 | 0 |
 | images and media (5 binary new, 14 binary changed) | 6 | 12 | 16 | 1 | 16 |
-| documentation and store texts | 8 | 352 | 4 | 41 | 167 |
-| **total** | **18** | **652** | **34** | **69** | **190** |
+| documentation and store texts | 9 | 401 | 4 | 76 | 167 |
+| **total** | **21** | **1068** | **39** | **113** | **196** |
 
 ## In proportion
 
 - Swiftfin's Swift code for the shared and tvOS targets at the branch point: about **66,800 lines** (`Shared/` and `Swiftfin tvOS/`).
-- nilumio added **154 lines of Swift** in two new files (`Shared/Nilumio/`: colours, about notice, start-up intro) and changed **17 lines** (5 removed) in 11 Swiftfin files, each marked with `// nilumio`. That is well under 1 % of the code.
+- nilumio added **about 520 lines of Swift** in four new files (`Shared/Nilumio/`: colours, about notice, start-up intro and SyncPlay) and changed **25 lines** (11 removed) in 16 Swiftfin files, each marked with `// nilumio`. That is under 1 % of the code.
 - Everything else is artwork (app icon, top shelf, intro video), the British English strings, configuration and this documentation.
-- SyncPlay (*Watch together*, `Shared/Nilumio/SyncPlay/`) is in progress and not yet counted here.
 
 ## Keeping these numbers current
 

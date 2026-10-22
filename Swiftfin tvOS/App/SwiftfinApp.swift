@@ -22,6 +22,7 @@ struct SwiftfinApp: App {
             OverlayToastView {
                 WithLocalUserAuthentication {
                     RootView()
+                        .nilumioIntro() // nilumio: Start-Animation
                 }
             }
         }

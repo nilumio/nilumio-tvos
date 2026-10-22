@@ -123,6 +123,9 @@ struct ContentGroupView<Provider: ContentGroupProvider>: View {
         .onFirstAppear {
             viewModel.refresh()
         }
+        .onChange(of: viewModel.state) { _, state in // nilumio: Intro darf ausblenden
+            if state == .content || state == .error { NotificationCenter.default.post(name: .nilumioStartseiteGeladen, object: nil) }
+        }
         .refreshable {
             viewModel.refresh()
         }

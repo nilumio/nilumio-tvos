@@ -44,7 +44,7 @@ struct ProgressIndicator: View {
     private var progressBar: some View {
         ProgressView(value: normalizedProgress)
             .progressViewStyle(.playback)
-            .foregroundStyle(accentColor)
+            .foregroundStyle(Color.nilumioFortschritt) // nilumio
             .frame(height: 6)
             .padding(.horizontal, 5)
             .padding(.bottom, 5)
@@ -54,7 +54,7 @@ struct ProgressIndicator: View {
     @ViewBuilder
     private var compactProgressBar: some View {
         Rectangle()
-            .fill(accentColor)
+            .fill(Color.nilumioFortschritt) // nilumio
             .scaleEffect(x: normalizedProgress, y: 1, anchor: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .frame(height: 6)

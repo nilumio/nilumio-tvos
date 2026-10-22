@@ -37,7 +37,7 @@ enum ColorPickerDefaults: CaseIterable, Displayable {
     var displayTitle: String {
         switch self {
         case .jellyfin:
-            L10n.jellyfin
+            Nilumio.name // nilumio
         case .red:
             L10n.red
         case .orange:

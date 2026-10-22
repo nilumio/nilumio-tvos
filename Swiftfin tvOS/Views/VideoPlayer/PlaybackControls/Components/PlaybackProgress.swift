@@ -142,6 +142,7 @@ extension VideoPlayer.PlaybackControls {
                 }
             }
             .sliderContainerStyle(.capsule(showsProgressWhenUnfocused: false))
+            .foregroundStyle(Color.nilumioFortschritt) // nilumio
             .if(chapterSlider) { view in
                 if let chapters = manager.item.chapters, chapters.isNotEmpty {
                     view.inverseMask { ChapterTrackMask(chapters: chapters, runtime: manager.item.runtime ?? .zero) }

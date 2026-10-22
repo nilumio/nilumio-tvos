@@ -1,18 +1,36 @@
-<!-- nilumio: Anfang -->
-# nilumio für Apple TV
+<!-- nilumio: start of fork section. Everything below the end marker is the original Swiftfin README. -->
+# nilumio for Apple TV
 
-**nilumio** ist ein Jellyfin-Client für Apple TV. Er ist ein Fork von
-[Swiftfin](https://github.com/jellyfin/Swiftfin) (Basis: `main` vom 21.10.2026, nach Release 1.6.1) und steht wie
-Swiftfin unter der [Mozilla Public License 2.0](LICENSE.md). nilumio ist kein offizielles
-Jellyfin-Projekt. Herkunft, Lizenz und die Liste aller geänderten Swiftfin-Dateien
-stehen in [NOTICE.md](NOTICE.md).
+> **Kurz auf Deutsch:** nilumio ist eine Apple-TV-App für deinen eigenen Jellyfin-Server. Sie ist ein Fork von Swiftfin und steht wie Swiftfin unter der Mozilla Public License 2.0. Neu sind eigenes Design, Start-Intro, britisches Englisch und gemeinsames Schauen (SyncPlay). Alle Änderungen gegenüber Swiftfin stehen in [NILUMIO_CHANGES.md](NILUMIO_CHANGES.md). Kontakt: webmaster@nilumio.com
 
-*English: nilumio is a Jellyfin client for Apple TV, forked from Swiftfin (main, October 2026) and
-licensed under the MPL-2.0. See NOTICE.md for origin, licence and the list of changes.*
+**nilumio** is an Apple TV app for your own [Jellyfin](https://jellyfin.org) media server. It is a fork of [Swiftfin](https://github.com/jellyfin/Swiftfin), the Jellyfin community's native client, and keeps Swiftfin's interface and its VLC and native players.
 
-## Bauen
+What nilumio adds on top of Swiftfin:
 
-Voraussetzung: Xcode 26.6 oder neuer (getestet mit Xcode 27.1, tvOS-27-Simulator).
+- its own name, app icon, top shelf images and colours, and a short start-up intro
+- *Watch together*: synchronised playback with Jellyfin SyncPlay groups, also together with Jellyfin Web or Android
+- British English texts (colour, favourite, licence)
+
+nilumio is not an official Jellyfin product and does not use the Jellyfin or Swiftfin logos. Website: [nilumio.com](https://nilumio.com)
+
+## Screenshots
+
+| Intro | Start | Home |
+|---|---|---|
+| ![Intro](docs/screenshots/01-intro.png) | ![Start](docs/screenshots/02-start.png) | ![Home](docs/screenshots/03-homescreen.png) |
+
+<!-- More screenshots to follow. Use only freely licensed media (for example the Blender open movies). -->
+
+## Origin and licence
+
+- Based on Swiftfin `main` at commit [`04e0aa1`](https://github.com/jellyfin/Swiftfin/commit/04e0aa10812385be55831cbf925dbee925056976) (21 October 2026, after release 1.6.1). The upstream repository is configured as the `upstream` remote.
+- Licence: [Mozilla Public License 2.0](LICENSE.md), like Swiftfin. Swiftfin's licence headers stay in place. Origin and licence are summarised in [NOTICE.md](NOTICE.md); every added or changed file, with dates, is listed in [NILUMIO_CHANGES.md](NILUMIO_CHANGES.md).
+- Libraries and other third-party material: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- An overview of how much of this repository is nilumio's own work: [docs/OWN_CODE.md](docs/OWN_CODE.md).
+
+## Building
+
+Requirements: Xcode 26.6 or newer (tested with Xcode 27.1 and the tvOS 27 simulator).
 
 ```sh
 xcodebuild -project Swiftfin.xcodeproj -scheme "Swiftfin tvOS" -configuration Debug \
@@ -20,22 +38,32 @@ xcodebuild -project Swiftfin.xcodeproj -scheme "Swiftfin tvOS" -configuration De
   -skipMacroValidation -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO build
 ```
 
-Auf einem echten Apple TV: In Xcode das Schema „Swiftfin tvOS“ öffnen, unter
-Signing & Capabilities das eigene Team wählen (oder `XcodeConfig/DevelopmentTeam.xcconfig`
-mit `DEVELOPMENT_TEAM = …` anlegen, steht in `.gitignore`) und das gekoppelte Apple TV als Ziel nehmen.
+On a real Apple TV: open the scheme "Swiftfin tvOS" in Xcode, choose your own team under
+Signing & Capabilities (or create `XcodeConfig/DevelopmentTeam.xcconfig` with
+`DEVELOPMENT_TEAM = …`; the file is ignored by git) and select the paired Apple TV as the destination.
 
-## Gemeinsam schauen (SyncPlay)
+## Watch together (SyncPlay)
 
-Menüpunkt „Gemeinsam schauen“: Gruppe anlegen oder beitreten (auch gemeinsam mit Jellyfin-Web, Android usw.).
-In einer Gruppe gehen Pause, Weiter und Spulen als Anfrage an den Server; ausgeführt wird der Befehl des
-Servers auf allen Geräten zur selben Serverzeit. Wer in der Gruppe etwas startet, gibt es allen vor.
-Voraussetzung: SyncPlay ist für den Benutzer auf dem Server erlaubt.
+The menu entry *Watch together* creates or joins a SyncPlay group, also with Jellyfin Web,
+Android and other clients. In a group, pause, play and seeking are sent to the server as
+requests; the server's command is then carried out on every device at the same server time.
+Whoever starts something in the group starts it for everyone. SyncPlay must be allowed for
+the user on the server.
 
-Upstream einspielen: `git fetch upstream --tags && git merge <neues-release-tag>`.
-Eigener Code liegt in `Shared/Nilumio/`, Eingriffe in Swiftfin-Dateien sind mit `// nilumio` markiert.
+## Contributing
+
+Small, focused pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md)
+first: bugs that also exist in Swiftfin should go to Swiftfin first. nilumio's own code lives in
+`Shared/Nilumio/`, and changes to Swiftfin files are marked with `// nilumio`, so upstream
+updates stay easy ([docs/UPSTREAM.md](docs/UPSTREAM.md)).
+
+## Contact
+
+- General questions and feedback: webmaster@nilumio.com
+- Security issues: see [SECURITY.md](SECURITY.md)
 
 ---
-<!-- nilumio: Ende – ab hier die ursprüngliche Swiftfin-README -->
+<!-- nilumio: end of fork section. Original Swiftfin README follows. -->
 
 <div align="center">
   <img alt="Swiftfin" src="./Resources/primary-wide.svg">

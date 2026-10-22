@@ -23,8 +23,7 @@ enum Nilumio {
     static let name = "nilumio"
 
     /// Quelltext dieses Forks (MPL-2.0 verlangt den Hinweis).
-    /// TODO: Sobald das öffentliche Fork-Repo existiert, hier dessen Adresse eintragen.
-    static let quelltext = "github.com/jellyfin/Swiftfin"
+    static let quelltext = "github.com/nilumio/nilumio-tvos"
 
     static var istDeutsch: Bool {
         Locale.preferredLanguages.first?.hasPrefix("de") ?? false

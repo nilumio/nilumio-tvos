@@ -1,75 +1,74 @@
-# NOTICE – nilumio für Apple TV
+# NOTICE – nilumio for Apple TV
 
-nilumio (tvOS) ist ein Fork von **Swiftfin** (https://github.com/jellyfin/Swiftfin),
-dem freien Jellyfin-Client der Jellyfin-Community.
+nilumio (tvOS) is a fork of **Swiftfin** (https://github.com/jellyfin/Swiftfin),
+the free Jellyfin client made by the Jellyfin community.
 
-- Basis: Swiftfin `main` vom 21.10.2026 (Commit `04e0aa10812385be55831cbf925dbee925056976`, nach Release 1.6.1).
-  Release 1.6.1 selbst baut mit Xcode 27.1 nicht (Paket CoreStore 9.3.0: „ambiguous use of cs_sync“, dazu VLCKit über Carthage).
-- Upstream-Remote: `upstream` → https://github.com/jellyfin/Swiftfin.git
-- Branch mit unseren Änderungen: `nilumio`
-- Lizenz: Mozilla Public License 2.0 (siehe `LICENSE.md`). Alle Swiftfin-Dateien –
-  auch die von uns geänderten – bleiben MPL-2.0, ihre Lizenzköpfe bleiben stehen.
-- „Jellyfin“ und „Swiftfin“ sind Namen der Jellyfin-Projekte. nilumio ist kein
-  offizielles Jellyfin-Produkt; Name und Logo von Jellyfin/Swiftfin werden in der App
-  nicht verwendet (Markenregeln: https://jellyfin.org/docs/general/contributing/branding/).
-- Abhängigkeiten behalten ihre eigenen Lizenzen (u. a. SwiftVLC/libVLC, MPVUI, Nuke,
-  Factory, Defaults, CoreStore, jellyfin-sdk-swift); siehe die jeweiligen Pakete.
+- Base: Swiftfin `main` of 21 October 2026 (commit `04e0aa10812385be55831cbf925dbee925056976`, after release 1.6.1).
+  Release 1.6.1 itself does not build with Xcode 27.1 (package CoreStore 9.3.0: "ambiguous use of cs_sync", plus VLCKit via Carthage).
+- Upstream remote: `upstream` → https://github.com/jellyfin/Swiftfin.git
+- Licence: Mozilla Public License 2.0 (see `LICENSE.md`). All Swiftfin files,
+  including those we changed, stay under the MPL-2.0 and keep their licence headers.
+- "Jellyfin" and "Swiftfin" are names of the Jellyfin projects. nilumio is not an
+  official Jellyfin product; the Jellyfin and Swiftfin names and logos are not used in the app
+  (branding rules: https://jellyfin.org/docs/general/contributing/branding/).
+- Dependencies keep their own licences (including SwiftVLC/libVLC, MPVUI, Nuke,
+  Factory, Defaults, CoreStore and jellyfin-sdk-swift); see the respective packages.
 
-## Neue Dateien (nilumio)
+## New files (nilumio)
 
-| Datei | Zweck |
+| File | Purpose |
 |---|---|
-| `Shared/Nilumio/Nilumio.swift` | Farben (Türkis #22ABD8, Lila #4B3DB8, Grund #070A12), Herkunftshinweis für „Über“ |
-| `Shared/Nilumio/NilumioIntro.swift` | Start-Animation (Video, weiche Überblendung) |
-| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | „Gemeinsam schauen“ (Jellyfin SyncPlay): Gruppe, Zeitabgleich, Serverbefehle im Player |
-| `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | Seite und Menüpunkt „Gemeinsam schauen“ |
-| `Swiftfin tvOS/Resources/nilumio-intro.mp4` | Intro-Video |
-| `Swiftfin tvOS/Resources/Assets.xcassets/LaunchScreenBackground.colorset` | Startbildschirm-Farbe #070A12 |
-| `Translations/en-GB.lproj/Localizable.strings` | britische Schreibweise (colour, favourite, licence …) |
-| `NOTICE.md` | diese Datei |
-| `docs/screenshots/` | Simulator-Screenshots |
+| `Shared/Nilumio/Nilumio.swift` | Colours (turquoise #22ABD8, purple #4B3DB8, background #070A12), source notice for "About" |
+| `Shared/Nilumio/NilumioIntro.swift` | Start-up animation (video with soft cross-fade) |
+| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | "Watch together" (Jellyfin SyncPlay): groups, clock sync, server commands in the player |
+| `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | "Watch together" page and menu entry |
+| `Swiftfin tvOS/Resources/nilumio-intro.mp4` | Intro video |
+| `Swiftfin tvOS/Resources/Assets.xcassets/LaunchScreenBackground.colorset` | Launch screen colour #070A12 |
+| `Translations/en-GB.lproj/Localizable.strings` | British spelling (colour, favourite, licence …) |
+| `NOTICE.md` | this file |
+| `docs/screenshots/` | Simulator screenshots |
 
-Bilder und Video von nilumio (Icons, Top-Shelf, Intro) stehen nicht unter MPL;
-alle Rechte vorbehalten.
+nilumio's images and video (icons, top shelf, intro) are not covered by the MPL;
+all rights reserved.
 
-## Geänderte Swiftfin-Dateien
+## Changed Swiftfin files
 
-Jede Änderung im Code ist mit `// nilumio` markiert.
+Every change in code is marked with `// nilumio`.
 
-| Datei | Änderung |
+| File | Change |
 |---|---|
-| `XcodeConfig/Shared.xcconfig` | Bundle-ID `com.held0.nilumio` |
-| `Swiftfin tvOS/Resources/Info.plist` | Anzeigename „nilumio“ |
-| `Swiftfin tvOS/App/SwiftfinApp.swift` | `.nilumioIntro()` um die App |
-| `Shared/Extensions/Color.swift` | `jellyfinPurple` zeigt auf nilumio-Türkis (Standard-Akzentfarbe) |
-| `Shared/Strings/ProperNouns.swift` | sichtbarer Name „Swiftfin“ → „nilumio“ |
-| `Scripts/Translations/GenerateStrings.swift` | Generator schreibt in `L10n.tr` die Ersetzung „Swiftfin“ → „nilumio“ |
-| `Shared/Strings/Strings.swift` | davon erzeugt (eine Zeile) |
-| `Shared/Views/AboutAppView.swift` | Herkunfts-/Lizenzhinweis in „Über“ |
-| `Shared/Views/ContentGroupView.swift` | meldet „Startseite geladen“ an das Intro |
-| `Shared/Components/PosterIndicators/ProgressIndicator.swift` | Fortschrittsbalken Lila |
-| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackProgress.swift` | Player-Fortschritt Lila |
-| `Shared/Views/AppSettingsView.swift` | App-Icon-Auswahl auf tvOS ausgeblendet (Alternativ-Icons zeigen das Jellyfin-Logo) |
-| `Swiftfin tvOS/Components/ColorPicker/ColorPickerDefaults.swift` | Farbvorgabe heißt „nilumio“ statt „Jellyfin“ |
-| `Swiftfin tvOS/Resources/Assets.xcassets/App Icon & Top Shelf Image.brandassets/**` | App-Icon (Ebenen) und Top-Shelf-Bilder ersetzt |
-| `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/*` | Jellyfin-Logo durch nilumio-Zeichen ersetzt (Asset-Name bleibt) |
-| `Shared/Coordinators/Tabs/MainTabView.swift` | Menüpunkt „Gemeinsam schauen“ (tvOS) |
-| `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift` | `playItem` nicht mehr `private` (SyncPlay startet darüber das Gruppen-Item) |
-| `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | Play/Pause der Fernbedienung über `nilumioSetPlayback` (in einer Gruppe Anfrage an den Server) |
-| `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | Spulen (Scrubben) in einer Gruppe als Anfrage an den Server |
-| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | Vor-/Zurückspringen in einer Gruppe als Anfrage an den Server |
-| `README.md` | nilumio-Abschnitt oben |
+| `XcodeConfig/Shared.xcconfig` | Bundle ID `com.held0.nilumio` |
+| `Swiftfin tvOS/Resources/Info.plist` | Display name "nilumio" |
+| `Swiftfin tvOS/App/SwiftfinApp.swift` | `.nilumioIntro()` around the app |
+| `Shared/Extensions/Color.swift` | `jellyfinPurple` points to nilumio turquoise (default accent colour) |
+| `Shared/Strings/ProperNouns.swift` | Visible name "Swiftfin" → "nilumio" |
+| `Scripts/Translations/GenerateStrings.swift` | Generator writes the replacement "Swiftfin" → "nilumio" into `L10n.tr` |
+| `Shared/Strings/Strings.swift` | Generated from the above (one line) |
+| `Shared/Views/AboutAppView.swift` | Origin and licence notice in "About" |
+| `Shared/Views/ContentGroupView.swift` | Tells the intro that the home screen has loaded |
+| `Shared/Components/PosterIndicators/ProgressIndicator.swift` | Purple progress bar |
+| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackProgress.swift` | Purple player progress |
+| `Shared/Views/AppSettingsView.swift` | App icon picker hidden on tvOS (the alternative icons show the Jellyfin logo) |
+| `Swiftfin tvOS/Components/ColorPicker/ColorPickerDefaults.swift` | Colour preset named "nilumio" instead of "Jellyfin" |
+| `Swiftfin tvOS/Resources/Assets.xcassets/App Icon & Top Shelf Image.brandassets/**` | App icon layers and top shelf images replaced |
+| `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/*` | Jellyfin logo replaced by the nilumio mark (asset name unchanged) |
+| `Shared/Coordinators/Tabs/MainTabView.swift` | "Watch together" menu entry (tvOS) |
+| `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift` | `playItem` no longer `private` (SyncPlay starts the group's item through it) |
+| `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | Remote play/pause goes through `nilumioSetPlayback` (a request to the server when in a group) |
+| `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | Scrubbing sent to the server as a request when in a group |
+| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | Skipping forward/back sent to the server as a request when in a group |
+| `README.md` | nilumio section at the top |
 
-## SyncPlay („Gemeinsam schauen“) und Lizenz
+## SyncPlay ("Watch together") and licensing
 
-Swiftfin hat kein SyncPlay (Issue jellyfin/Swiftfin#688). Die Umsetzung in `Shared/Nilumio/SyncPlay/`
-ist neu geschrieben nach der öffentlichen Jellyfin-API (OpenAPI: `/SyncPlay/*`, `/GetUtcTime`,
-WebSocket-Nachrichten `SyncPlayCommand`/`SyncPlayGroupUpdate`) und nutzt Endpunkte, Datentypen und
-WebSocket aus jellyfin-sdk-swift (MPL-2.0) bzw. Swiftfins `ServerSocketManager`. Es ist kein Code aus
-jellyfin-web (GPL-2.0) oder aus der Android-Umsetzung (wholphin-fork) übernommen; der Zeitabgleich ist das
-allgemein bekannte NTP-Verfahren. Die Dateien stehen deshalb unter der MPL-2.0.
+Swiftfin has no SyncPlay (issue jellyfin/Swiftfin#688). The implementation in `Shared/Nilumio/SyncPlay/`
+was written from scratch against the public Jellyfin API (OpenAPI: `/SyncPlay/*`, `/GetUtcTime`,
+WebSocket messages `SyncPlayCommand`/`SyncPlayGroupUpdate`). It uses endpoints, data types and the
+WebSocket from jellyfin-sdk-swift (MPL-2.0) and Swiftfin's `ServerSocketManager`. No code was taken from
+jellyfin-web (GPL-2.0) or from the Android app; the clock sync is the well-known NTP method.
+These files are therefore licensed under the MPL-2.0.
 
-Prüfen: `git diff --stat 04e0aa10..nilumio`
+Check: `git diff --stat 04e0aa10..HEAD`
 
-Hinweis: Jeder Build lässt `Scripts/Translations/GenerateStrings.swift` laufen; das kann `Translations/en.lproj/Localizable.strings`
-minimal umformatieren (Upstream-Verhalten). Diese Änderung nicht committen (`git checkout Translations/en.lproj`).
+Note: every build runs `Scripts/Translations/GenerateStrings.swift`, which can slightly reformat
+`Translations/en.lproj/Localizable.strings` (upstream behaviour). Do not commit that change (`git checkout Translations/en.lproj`).

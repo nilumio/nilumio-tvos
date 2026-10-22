@@ -100,6 +100,8 @@ struct AboutAppView: View {
                 .symbolRenderingMode(.monochrome)
                 #endif
             }
+
+            NilumioHerkunftSection() // nilumio
         }
         .navigationTitle(L10n.aboutApp)
     }

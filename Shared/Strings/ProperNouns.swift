@@ -129,7 +129,7 @@ extension L10n {
 
     // MARK: - Brands
 
-    static let swiftfin = "Swiftfin"
+    static let swiftfin = "nilumio" // nilumio: sichtbarer App-Name
     static let jellyfin = "Jellyfin"
 
     // MARK: - Platforms

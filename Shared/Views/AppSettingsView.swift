@@ -67,9 +67,11 @@ struct AppSettingsView: View {
 
             Section(L10n.customize) {
 
+                #if os(iOS) // nilumio: Alternativ-Icons tragen das Jellyfin-Logo
                 ChevronButton(L10n.appIcon) {
                     router.route(to: .appIconSelector)
                 }
+                #endif
 
                 #if os(iOS)
                 if !selectUserUseSplashscreen {

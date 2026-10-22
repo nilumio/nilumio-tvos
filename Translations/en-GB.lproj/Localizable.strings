@@ -1,0 +1,28 @@
+/*
+  nilumio: britische Schreibweise (en-GB) für Texte, die in en.lproj amerikanisch sind.
+  Fehlende Schlüssel fallen auf en.lproj zurück.
+*/
+
+"accentColor" = "Accent colour";
+"addToFavorites" = "Add to favourites";
+"authorize" = "Authorise";
+"autoDescription" = "Optimises playback using default settings for most devices. Some formats may require server transcoding for non-compatible media types.";
+"behavior" = "Behaviour";
+"bitrateMaxDescription" = "Maximises bandwidth usage, up to %@, for each playback stream to ensure the highest quality.";
+"color" = "Colour";
+"colorist" = "Colourist";
+"customDescription" = "Allows advanced customisation of device profiles for native playback. Incorrect settings may affect playback.";
+"customize" = "Customise";
+"favorite" = "Favourite";
+"favorited" = "Favourited";
+"favorites" = "Favourites";
+"hexColor" = "Hex colour";
+"imagesDescription" = "Manage and customise the images associated with this media item. Select an image type to view, add, or replace images.";
+"license" = "Licence";
+"quickConnectSuccessMessage" = "Authorising Quick Connect successful. Please continue on your other device.";
+"removeFromFavorites" = "Remove from favourites";
+"showFavorited" = "Show favourited";
+"subtitleColor" = "Subtitle colour";
+"tagsDescription" = "Labels used to organise or highlight specific attributes of media.";
+"unauthorized" = "Unauthorised";
+"unauthorizedUser" = "Unauthorised user";

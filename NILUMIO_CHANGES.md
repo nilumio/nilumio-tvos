@@ -19,7 +19,7 @@ To see every change in detail: `git diff 04e0aa10..HEAD` or `git log 04e0aa10..H
 | Start-up intro | Intro video that fades into the app once the home screen has loaded | `Shared/Nilumio/NilumioIntro.swift`, `Swiftfin tvOS/Resources/nilumio-intro.mp4`, `Swiftfin tvOS/App/SwiftfinApp.swift`, `Shared/Views/ContentGroupView.swift` |
 | About and settings | Origin and licence notice under About; app icon picker hidden on tvOS (alternative icons show the Jellyfin logo) | `Shared/Views/AboutAppView.swift`, `Shared/Views/AppSettingsView.swift` |
 | British English | New `en-GB` strings (colour, favourite, licence) | `Translations/en-GB.lproj/Localizable.strings` |
-| SyncPlay (SyncPlay) | Groups, clock sync and server commands in the player, written against the public Jellyfin API | `Shared/Nilumio/SyncPlay/`, `Shared/Coordinators/Tabs/MainTabView.swift`, `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift`, `Shared/Views/VideoPlayer/Container/*`, `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` |
+| SyncPlay | Groups, clock sync and server commands in the player, written against the public Jellyfin API | `Shared/Nilumio/SyncPlay/`, `Tests/Nilumio/`, `Shared/Coordinators/Tabs/MainTabView.swift`, `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift`, `Shared/Views/VideoPlayer/Container/*`, `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` |
 | Docs and repository | Fork documentation, issue templates, ignore rules | `README.md`, `NOTICE.md`, `NILUMIO_CHANGES.md`, `THIRD_PARTY_NOTICES.md`, `CONTRIBUTING.md`, `SECURITY.md`, `docs/`, `.github/ISSUE_TEMPLATE/`, `.gitignore` |
 
 ## All added, modified, removed and renamed files
@@ -35,29 +35,30 @@ Generated with `python3 docs/tools/nilumio_changes.py list`. Please regenerate a
 | added | `.github/ISSUE_TEMPLATE/idea.yml` | 2026-10-22 |
 | modified | `.gitignore` | 2026-10-22 |
 | added | `CONTRIBUTING.md` | 2026-10-22 |
-| added | `NILUMIO_CHANGES.md` | 2026-10-22 |
-| added | `NOTICE.md` | 2026-10-22 |
-| modified | `README.md` | 2026-10-22 |
+| added | `NILUMIO_CHANGES.md` | 2026-10-22 to 2026-10-23 |
+| added | `NOTICE.md` | 2026-10-22 to 2026-10-23 |
+| modified | `README.md` | 2026-10-22 to 2026-10-23 |
 | added | `SECURITY.md` | 2026-10-22 |
 | modified | `Scripts/Translations/GenerateStrings.swift` | 2026-10-22 |
-| modified | `Shared/Components/PosterIndicators/ProgressIndicator.swift` | 2026-10-22 |
+| modified | `Shared/Components/PosterIndicators/ProgressIndicator.swift` | 2026-10-22 to 2026-10-23 |
 | modified | `Shared/Coordinators/Tabs/MainTabView.swift` | 2026-10-22 |
-| modified | `Shared/Extensions/Color.swift` | 2026-10-22 |
-| added | `Shared/Nilumio/Nilumio.swift` | 2026-10-22 |
-| added | `Shared/Nilumio/NilumioIntro.swift` | 2026-10-22 |
-| added | `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | 2026-10-22 |
-| added | `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | 2026-10-22 |
+| modified | `Shared/Extensions/Color.swift` | 2026-10-22 to 2026-10-23 |
+| added | `Shared/Nilumio/Nilumio.swift` | 2026-10-22 to 2026-10-23 |
+| added | `Shared/Nilumio/NilumioIntro.swift` | 2026-10-22 to 2026-10-23 |
+| added | `Shared/Nilumio/SyncPlay/SyncPlayClock.swift` | 2026-10-23 |
+| added | `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | 2026-10-22 to 2026-10-23 |
+| added | `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | 2026-10-22 to 2026-10-23 |
 | modified | `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/Contents.json` | 2026-10-22 |
 | removed | `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/jellyfin-blob.svg` | 2026-10-22 |
 | added | `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/nilumio-zeichen.png` | 2026-10-22 |
 | modified | `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift` | 2026-10-22 |
 | modified | `Shared/Strings/ProperNouns.swift` | 2026-10-22 |
 | modified | `Shared/Strings/Strings.swift` | 2026-10-22 |
-| modified | `Shared/Views/AboutAppView.swift` | 2026-10-22 |
+| modified | `Shared/Views/AboutAppView.swift` | 2026-10-22 to 2026-10-23 |
 | modified | `Shared/Views/AppSettingsView.swift` | 2026-10-22 |
-| modified | `Shared/Views/ContentGroupView.swift` | 2026-10-22 |
+| modified | `Shared/Views/ContentGroupView.swift` | 2026-10-22 to 2026-10-23 |
 | modified | `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | 2026-10-22 |
-| modified | `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | 2026-10-22 |
+| modified | `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | 2026-10-22 to 2026-10-23 |
 | modified | `Swiftfin tvOS/App/SwiftfinApp.swift` | 2026-10-22 |
 | modified | `Swiftfin tvOS/Components/ColorPicker/ColorPickerDefaults.swift` | 2026-10-22 |
 | modified | `Swiftfin tvOS/Resources/Assets.xcassets/App Icon & Top Shelf Image.brandassets/App Icon - App Store.imagestack/Back.imagestacklayer/Content.imageset/1280x768-back.png` | 2026-10-22 |
@@ -77,9 +78,10 @@ Generated with `python3 docs/tools/nilumio_changes.py list`. Please regenerate a
 | added | `Swiftfin tvOS/Resources/Assets.xcassets/LaunchScreenBackground.colorset/Contents.json` | 2026-10-22 |
 | modified | `Swiftfin tvOS/Resources/Info.plist` | 2026-10-22 |
 | added | `Swiftfin tvOS/Resources/nilumio-intro.mp4` | 2026-10-22 |
-| modified | `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | 2026-10-22 |
-| modified | `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackProgress.swift` | 2026-10-22 |
+| modified | `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | 2026-10-22 to 2026-10-23 |
+| modified | `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackProgress.swift` | 2026-10-22 to 2026-10-23 |
 | added | `THIRD_PARTY_NOTICES.md` | 2026-10-22 |
+| added | `Tests/Nilumio/SyncPlayClockTests.swift` | 2026-10-23 |
 | added | `Translations/en-GB.lproj/Localizable.strings` | 2026-10-22 |
 | modified | `XcodeConfig/Shared.xcconfig` | 2026-10-22 |
 | added | `docs/OWN_CODE.md` | 2026-10-22 |

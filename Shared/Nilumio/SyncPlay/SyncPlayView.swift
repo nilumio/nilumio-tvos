@@ -8,15 +8,11 @@
 import JellyfinAPI
 import SwiftUI
 
-private func t(_ de: String, _ en: String) -> String {
-    Nilumio.istDeutsch ? de : en
-}
-
 extension TabItem {
 
     static var syncPlay: TabItem {
         _ = SyncPlayManager.shared // Gruppen-Nachrichten ab App-Start empfangen
-        return TabItem(id: "nilumio-syncplay", title: t("SyncPlay", "SyncPlay"), systemImage: "person.2") {
+        return TabItem(id: "nilumio-syncplay", title: "SyncPlay", systemImage: "person.2") {
             SyncPlayView()
         }
     }
@@ -30,44 +26,50 @@ struct SyncPlayView: View {
     var body: some View {
         List {
             if let group = syncPlay.group {
-                Section(t("Deine Gruppe", "Your group")) {
-                    LabeledContent(group.groupName ?? "–", value: (group.participants ?? []).joined(separator: ", "))
-                    Text(t(
-                        "Starte etwas zum Ansehen – alle in der Gruppe sehen es gleichzeitig. Pause und Spulen gelten für alle.",
-                        "Start something to watch – everyone in the group sees it at the same time. Pausing and seeking apply to everyone."
+                Section(Nilumio.text(de: "Deine Gruppe", en: "Your group")) {
+                    groupRow(group)
+                    Text(Nilumio.text(
+                        de: "Starte etwas zum Ansehen – alle in der Gruppe sehen es gleichzeitig. Pause und Spulen gelten für alle.",
+                        en: "Start something to watch – everyone in the group sees it at the same time. Pausing and seeking apply to everyone."
                     ))
                     .foregroundStyle(.secondary)
-                    Button(t("Gruppe verlassen", "Leave group"), role: .destructive) { syncPlay.verlassen() }
+                    Button(Nilumio.text(de: "Gruppe verlassen", en: "Leave group"), role: .destructive) { syncPlay.leave() }
                 }
             } else {
                 Section {
                     Button {
-                        Task { await syncPlay.erstellen() }
+                        Task { await syncPlay.createGroup() }
                     } label: {
-                        Label(t("Neue Gruppe", "New group"), systemImage: "plus")
+                        Label(Nilumio.text(de: "Neue Gruppe", en: "New group"), systemImage: "plus")
                     }
                 }
-                Section(t("Gruppen auf dem Server", "Groups on the server")) {
+                Section(Nilumio.text(de: "Gruppen auf dem Server", en: "Groups on the server")) {
                     if syncPlay.groups.isEmpty {
-                        Text(t("Keine Gruppen. Lege eine an oder starte eine in einer anderen Jellyfin-App.",
-                               "No groups. Create one or start one in another Jellyfin app."))
-                            .foregroundStyle(.secondary)
+                        Text(Nilumio.text(
+                            de: "Keine Gruppen. Lege eine an oder starte eine in einer anderen Jellyfin-App.",
+                            en: "No groups. Create one or start one in another Jellyfin app."
+                        ))
+                        .foregroundStyle(.secondary)
                     }
                     ForEach(syncPlay.groups, id: \.groupID) { group in
                         Button {
-                            syncPlay.beitreten(group)
+                            syncPlay.join(group)
                         } label: {
-                            LabeledContent(group.groupName ?? "–", value: (group.participants ?? []).joined(separator: ", "))
+                            groupRow(group)
                         }
                     }
                 }
             }
-            if let fehler = syncPlay.fehler {
-                Text(fehler).foregroundStyle(.red)
+            if let errorMessage = syncPlay.errorMessage {
+                Text(errorMessage).foregroundStyle(.red)
             }
         }
-        .navigationTitle(t("SyncPlay", "SyncPlay"))
-        .task { await syncPlay.laden() }
-        .onChange(of: syncPlay.group?.groupID) { Task { await syncPlay.laden() } }
+        .navigationTitle("SyncPlay")
+        .task { await syncPlay.loadGroups() }
+        .onChange(of: syncPlay.group?.groupID) { Task { await syncPlay.loadGroups() } }
+    }
+
+    private func groupRow(_ group: GroupInfoDto) -> some View {
+        LabeledContent(group.groupName ?? "–", value: (group.participants ?? []).joined(separator: ", "))
     }
 }

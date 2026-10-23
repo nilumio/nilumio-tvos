@@ -16,7 +16,7 @@ import JellyfinAPI
 
 /// Hält die SyncPlay-Gruppe, gleicht die Uhr mit dem Server ab und führt Serverbefehle
 /// zur Serverzeit im Player aus. Nutzereingaben im Player gehen in einer Gruppe als
-/// Anfrage an den Server (`requestPlayback`, `requestSeek`), nicht direkt an den Player.
+/// Anfrage an den Server (`request(_:from:)`), nicht direkt an den Player.
 @MainActor
 final class SyncPlayManager: ObservableObject {
 
@@ -27,30 +27,39 @@ final class SyncPlayManager: ObservableObject {
     @Published
     private(set) var groups: [GroupInfoDto] = []
     @Published
-    private(set) var fehler: String?
+    private(set) var errorMessage: String?
 
-    /// Aktuelle Warteschlange der Gruppe (vom Server).
+    /// Warteschlange der Gruppe (vom Server)
     private var queue: PlayQueueUpdate?
-    /// Serverzeit minus lokale Zeit (Sekunden).
-    private var offset: TimeInterval = 0
-    /// Messungen (Laufzeit, Versatz); die mit der kürzesten Laufzeit gilt.
-    private var messungen: [(rtt: TimeInterval, offset: TimeInterval)] = []
-    private var zeitTask: Task<Void, Never>?
-    private var befehlTask: Task<Void, Never>?
+    private var clock = SyncPlayClock()
+    private var clockTask: Task<Void, Never>?
+    private var commandTask: Task<Void, Never>?
     private var readyTask: Task<Void, Never>?
     private var cancellables = Set<AnyCancellable>()
 
-    private var sessionManager: UserSessionManager { Container.shared.userSessionManager() }
-    private var session: UserSession? { sessionManager.currentSession }
-    private var player: MediaPlayerManager? { sessionManager.mediaPlayerManager }
+    @Injected(\.userSessionManager)
+    private var sessionManager
+
+    private var session: UserSession? {
+        sessionManager.currentSession
+    }
+
+    private var player: MediaPlayerManager? {
+        sessionManager.mediaPlayerManager
+    }
+
+    private var playingItem: SyncPlayQueueItem? {
+        queue?.playingItemIndex.flatMap { queue?.playlist?[safe: $0] }
+    }
 
     private init() {
         sessionManager.$currentSession
-            .map { $0?.serverSocketManager.events ?? Combine.Empty<JellyfinSocket.Session.Event, Never>().eraseToAnyPublisher() }
+            .map { $0?.serverSocketManager.events ?? Combine.Empty().eraseToAnyPublisher() }
             .switchToLatest()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] event in
                 guard case let .message(message) = event else { return }
+
                 switch message {
                 case let .syncPlayGroupUpdateMessage(m): m.data.map { self?.handle($0) }
                 case let .syncPlayCommandMessage(m): m.data.map { self?.handle($0) }
@@ -60,125 +69,127 @@ final class SyncPlayManager: ObservableObject {
             .store(in: &cancellables)
 
         // Startet jemand hier selbst etwas, wird es die neue Warteschlange der Gruppe.
-        Container.shared.mediaPlayerManagerPublisher()
+        Container.shared
+            .mediaPlayerManagerPublisher()
             .compactMap { $0?.$playbackItem }
             .switchToLatest()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] item in
-                guard let self, self.group != nil, let id = item?.baseItem.id, id != self.aktuellesItem?.itemID else { return }
+                guard let self, group != nil, let id = item?.baseItem.id, id != playingItem?.itemID else { return }
+
                 let ticks = item?.baseItem.startSeconds?.ticks ?? 0
-                self.senden(Paths.syncPlaySetNewQueue(.init(playingItemPosition: 0, playingQueue: [id], startPositionTicks: ticks)))
+                send(Paths.syncPlaySetNewQueue(.init(playingItemPosition: 0, playingQueue: [id], startPositionTicks: ticks)))
             }
             .store(in: &cancellables)
     }
 
     // MARK: Seite
 
-    func laden() async {
-        guard let session else { groups = []; return }
+    func loadGroups() async {
+        guard let session else {
+            groups = []
+            return
+        }
+
         do {
             groups = try await session.client.send(Paths.syncPlayGetGroups).value
-            fehler = nil
+            errorMessage = nil
         } catch {
-            fehler = error.localizedDescription
+            errorMessage = error.localizedDescription
         }
     }
 
-    func erstellen() async {
+    func createGroup() async {
         guard let session else { return }
-        let name = (Nilumio.istDeutsch ? "Gruppe von " : "Group of ") + session.user.username
+
+        let name = Nilumio.text(de: "Gruppe von ", en: "Group of ") + session.user.username
         do {
             _ = try await session.client.send(Paths.syncPlayCreateGroup(.init(groupName: name)))
         } catch is DecodingError {
             // Ältere Server antworten ohne Inhalt; die Gruppe kommt über den WebSocket.
         } catch {
-            fehler = error.localizedDescription
+            errorMessage = error.localizedDescription
         }
     }
 
-    func beitreten(_ gruppe: GroupInfoDto) {
-        senden(Paths.syncPlayJoinGroup(.init(groupID: gruppe.groupID)))
+    func join(_ group: GroupInfoDto) {
+        send(Paths.syncPlayJoinGroup(.init(groupID: group.groupID)))
     }
 
-    func verlassen() {
-        senden(Paths.syncPlayLeaveGroup)
-        zuruecksetzen()
+    func leave() {
+        send(Paths.syncPlayLeaveGroup)
+        reset()
     }
 
     // MARK: Anfragen aus dem Player
 
-    /// Spielt das Gerät gerade das Gruppen-Item?
-    private func imGruppenItem(_ manager: MediaPlayerManager?) -> Bool {
-        group != nil && manager?.playbackItem?.baseItem.id == aktuellesItem?.itemID
-    }
+    /// Spielt `manager` das Gruppen-Item, geht die Eingabe als Anfrage an den Server (`true`).
+    func request(_ request: Request<Void>, from manager: MediaPlayerManager) -> Bool {
+        guard group != nil, manager.playbackItem?.baseItem.id == playingItem?.itemID else { return false }
 
-    /// Play/Pause im Player. Gibt `true` zurück, wenn die Anfrage an den Server ging.
-    func requestPlayback(_ playing: Bool, manager: MediaPlayerManager?) -> Bool {
-        guard imGruppenItem(manager) else { return false }
-        senden(playing ? Paths.syncPlayUnpause : Paths.syncPlayPause)
-        return true
-    }
-
-    /// Spulen im Player. Gibt `true` zurück, wenn die Anfrage an den Server ging.
-    func requestSeek(_ position: Duration, manager: MediaPlayerManager?) -> Bool {
-        guard imGruppenItem(manager) else { return false }
-        senden(Paths.syncPlaySeek(.init(positionTicks: max(position, .zero).ticks)))
+        send(request)
         return true
     }
 
     // MARK: Gruppen-Updates
 
-    private var aktuellesItem: SyncPlayQueueItem? {
-        guard let queue, let index = queue.playingItemIndex else { return nil }
-        return queue.playlist?[safe: index]
-    }
-
     private func handle(_ update: GroupUpdate) {
         switch update {
         case let .syncPlayGroupJoinedUpdate(u):
             group = u.data
-            zeitabgleich()
+            startClockSync()
+
         case let .syncPlayUserJoinedUpdate(u):
-            if let name = u.data, group?.participants?.contains(name) == false { group?.participants?.append(name) }
+            if let name = u.data, group?.participants?.contains(name) == false {
+                group?.participants?.append(name)
+            }
+
         case let .syncPlayUserLeftUpdate(u):
             group?.participants?.removeAll { $0 == u.data }
+
         case .syncPlayGroupLeftUpdate, .syncPlayNotInGroupUpdate, .syncPlayGroupDoesNotExistUpdate:
-            zuruecksetzen()
+            reset()
+
         case .syncPlayLibraryAccessDeniedUpdate:
-            fehler = Nilumio.istDeutsch ? "Kein Zugriff auf diese Mediathek." : "No access to this library."
+            errorMessage = Nilumio.text(de: "Kein Zugriff auf diese Mediathek.", en: "No access to this library.")
+
         case let .syncPlayStateUpdate(u):
             group?.state = u.data?.state
+
         case let .syncPlayPlayQueueUpdate(u):
-            guard let neu = u.data else { return }
-            queue = neu
-            switch neu.reason {
-            case .newPlaylist, .setCurrentItem, .nextItem, .previousItem: abspielen()
-            default: break
+            guard let newQueue = u.data else { return }
+
+            queue = newQueue
+            if [.newPlaylist, .setCurrentItem, .nextItem, .previousItem].contains(newQueue.reason) {
+                playGroupItem()
             }
         }
     }
 
     /// Lädt das Gruppen-Item (falls nötig) und meldet „bereit“, sobald es spielbereit ist.
-    private func abspielen() {
-        guard let queue, let item = aktuellesItem, let itemID = item.itemID, let session else { return }
-        var start = queue.startPositionTicks ?? 0
-        if queue.isPlaying == true, let last = queue.lastUpdate {
-            start += Int((serverJetzt.timeIntervalSince(last)) * 10_000_000)
+    private func playGroupItem() {
+        guard let queue, let itemID = playingItem?.itemID, let session else { return }
+
+        var startTicks = queue.startPositionTicks ?? 0
+        if queue.isPlaying == true, let lastUpdate = queue.lastUpdate {
+            startTicks += Int(clock.serverTime().timeIntervalSince(lastUpdate) * 10_000_000)
         }
         if player?.playbackItem?.baseItem.id != itemID || !sessionManager.hasActivePlayback {
-            melden(bereit: false, ticks: start, playing: false)
-            sessionManager.playItem(id: itemID, startPositionTicks: start, userSession: session)
+            report(isReady: false, ticks: startTicks)
+            sessionManager.playItem(id: itemID, startPositionTicks: startTicks, userSession: session)
         }
+
         readyTask?.cancel()
         readyTask = Task { [weak self] in
             for _ in 0 ..< 240 {
                 try? await Task.sleep(for: .milliseconds(500))
                 guard let self, !Task.isCancelled else { return }
-                if let m = self.player, m.playbackItem?.baseItem.id == itemID, m.state == .playback,
-                   m.proxy?.isBuffering.value == false
+
+                if let player, player.playbackItem?.baseItem.id == itemID, player.state == .playback,
+                   player.proxy?.isBuffering.value == false
                 {
-                    await m.setPlaybackRequestStatus(status: .paused)
-                    self.melden(bereit: true, ticks: m.seconds.ticks, playing: false)
+                    await player.setPlaybackRequestStatus(status: .paused)
+                    report(isReady: true, ticks: player.seconds.ticks)
                     return
                 }
             }
@@ -187,109 +198,132 @@ final class SyncPlayManager: ObservableObject {
 
     // MARK: Serverbefehle
 
-    private func handle(_ befehl: SendCommand) {
-        guard group != nil, befehl.playlistItemID == nil || befehl.playlistItemID == aktuellesItem?.playlistItemID else { return }
-        let lokal = (befehl.when ?? serverJetzt).addingTimeInterval(-offset)
-        befehlTask?.cancel()
-        befehlTask = Task { [weak self] in
-            let warten = lokal.timeIntervalSinceNow
-            if warten > 0 { try? await Task.sleep(for: .seconds(warten)) }
-            guard let self, !Task.isCancelled, let m = self.player else { return }
-            let ticks = befehl.positionTicks ?? m.seconds.ticks
-            switch befehl.command {
+    private func handle(_ command: SendCommand) {
+        guard group != nil, command.playlistItemID == nil || command.playlistItemID == playingItem?.playlistItemID else { return }
+
+        let localTime = clock.localTime(at: command.when ?? clock.serverTime())
+        commandTask?.cancel()
+        commandTask = Task { [weak self] in
+            let delay = localTime.timeIntervalSinceNow
+            if delay > 0 {
+                try? await Task.sleep(for: .seconds(delay))
+            }
+            guard let self, !Task.isCancelled, let player else { return }
+
+            let ticks = command.positionTicks ?? player.seconds.ticks
+            switch command.command {
             case .unpause:
                 // Ist der Zeitpunkt schon vorbei, um die verstrichene Zeit weiter vorn einsetzen.
-                let ziel = Duration.ticks(ticks) + .seconds(max(0, -lokal.timeIntervalSinceNow))
-                if abs(m.seconds - ziel) > .milliseconds(500) { m.proxy?.setSeconds(ziel) }
-                await m.setPlaybackRequestStatus(status: .playing)
-            case .pause:
-                await m.setPlaybackRequestStatus(status: .paused)
-                m.proxy?.setSeconds(.ticks(ticks))
-            case .seek:
-                await m.setPlaybackRequestStatus(status: .paused)
-                m.proxy?.setSeconds(.ticks(ticks))
+                let target = Duration.ticks(ticks) + .seconds(max(0, -localTime.timeIntervalSinceNow))
+                if abs(player.seconds - target) > .milliseconds(500) {
+                    player.proxy?.setSeconds(target)
+                }
+                await player.setPlaybackRequestStatus(status: .playing)
+
+            case .pause, .seek:
+                await player.setPlaybackRequestStatus(status: .paused)
+                player.proxy?.setSeconds(.ticks(ticks))
+                guard command.command == .seek else { return }
+
                 try? await Task.sleep(for: .milliseconds(500))
-                while m.proxy?.isBuffering.value == true, !Task.isCancelled {
+                while player.proxy?.isBuffering.value == true, !Task.isCancelled {
                     try? await Task.sleep(for: .milliseconds(250))
                 }
-                self.melden(bereit: true, ticks: ticks, playing: false)
+                report(isReady: true, ticks: ticks)
+
             case .stop:
-                await m.stop()
+                await player.stop()
+
             case .none:
                 break
             }
         }
     }
 
-    private func melden(bereit: Bool, ticks: Int, playing: Bool) {
+    private func report(isReady: Bool, ticks: Int) {
         let info = PlaybackQueueStateInfo(
-            isPlaying: playing,
-            playlistItemID: aktuellesItem?.playlistItemID,
+            isPlaying: false,
+            playlistItemID: playingItem?.playlistItemID,
             positionTicks: ticks,
-            when: serverJetzt
+            when: clock.serverTime()
         )
-        senden(bereit ? Paths.syncPlayReady(info) : Paths.syncPlayBuffering(info))
+        send(isReady ? Paths.syncPlayReady(info) : Paths.syncPlayBuffering(info))
     }
 
-    // MARK: Zeitabgleich
+    // MARK: Uhrabgleich
 
-    private var serverJetzt: Date { Date().addingTimeInterval(offset) }
-
-    /// NTP-artig: Versatz = ((Empfang Server − Senden) + (Antwort Server − Empfang)) / 2.
     /// Drei schnelle Messungen, danach jede Minute; die halbe Laufzeit geht als Ping an den Server.
-    private func zeitabgleich() {
-        zeitTask?.cancel()
-        messungen = []
-        zeitTask = Task { [weak self] in
-            var runde = 0
-            while !Task.isCancelled {
-                guard let self, self.group != nil, let session = self.session else { return }
-                let gesendet = Date()
-                if let antwort = try? await session.client.send(Paths.getUtcTime).value,
-                   let t1 = antwort.requestReceptionTime, let t2 = antwort.responseTransmissionTime
+    private func startClockSync() {
+        clockTask?.cancel()
+        clock = SyncPlayClock(offset: clock.offset)
+        clockTask = Task { [weak self] in
+            for round in 0... {
+                guard let self, !Task.isCancelled, group != nil, let session else { return }
+
+                let sent = Date()
+                if let response = try? await session.client.send(Paths.getUtcTime).value,
+                   let serverReceived = response.requestReceptionTime, let serverSent = response.responseTransmissionTime
                 {
-                    let empfangen = Date()
-                    let rtt = empfangen.timeIntervalSince(gesendet) - t2.timeIntervalSince(t1)
-                    let versatz = (t1.timeIntervalSince(gesendet) + t2.timeIntervalSince(empfangen)) / 2
-                    self.messungen = Array((self.messungen + [(rtt, versatz)]).suffix(8))
-                    if let beste = self.messungen.min(by: { $0.rtt < $1.rtt }) {
-                        self.offset = beste.offset
-                        self.senden(Paths.syncPlayPing(.init(ping: Int(beste.rtt * 500))))
-                    }
+                    clock.add(sent: sent, serverReceived: serverReceived, serverSent: serverSent, received: Date())
+                    send(Paths.syncPlayPing(.init(ping: Int(clock.roundTrip * 500))))
                 }
-                runde += 1
-                try? await Task.sleep(for: .seconds(runde < 3 ? 1 : 60))
+                try? await Task.sleep(for: .seconds(round < 2 ? 1 : 60))
             }
         }
     }
 
     // MARK: Hilfen
 
-    private func zuruecksetzen() {
+    private func reset() {
         group = nil
         queue = nil
-        zeitTask?.cancel()
-        befehlTask?.cancel()
+        clockTask?.cancel()
+        commandTask?.cancel()
         readyTask?.cancel()
     }
 
-    private func senden(_ request: Request<Void>) {
+    private func send(_ request: Request<Void>) {
         guard let session else { return }
+
         Task { [weak self] in
             do {
                 try await session.client.send(request)
             } catch {
-                self?.fehler = error.localizedDescription
+                self?.errorMessage = error.localizedDescription
             }
         }
     }
 }
 
+/// Eingaben aus dem Player (Swiftfin-Stellen mit `// nilumio`): in einer SyncPlay-Gruppe
+/// als Anfrage an den Server, sonst wie bei Swiftfin direkt an den Player.
 extension MediaPlayerManager {
 
-    /// Play/Pause aus der Fernbedienung: in einer SyncPlay-Gruppe als Anfrage an den Server.
     func nilumioSetPlayback(_ status: PlaybackRequestStatus) {
-        guard !SyncPlayManager.shared.requestPlayback(status == .playing, manager: self) else { return }
-        setPlaybackRequestStatus(status: status)
+        if !SyncPlayManager.shared.request(status == .playing ? Paths.syncPlayUnpause : Paths.syncPlayPause, from: self) {
+            setPlaybackRequestStatus(status: status)
+        }
+    }
+
+    /// Nach dem Scrubben: an die Stelle springen und weiterspielen.
+    func nilumioSeekAndPlay(to position: Duration) {
+        if !requestSyncPlaySeek(to: position) {
+            proxy?.setSeconds(position)
+            setPlaybackRequestStatus(status: .playing)
+        }
+    }
+
+    func nilumioJump(by offset: Duration) {
+        guard !requestSyncPlaySeek(to: seconds + offset) else { return }
+
+        if offset < .zero {
+            proxy?.jumpBackward(.zero - offset)
+        } else {
+            proxy?.jumpForward(offset)
+        }
+    }
+
+    private func requestSyncPlaySeek(to position: Duration) -> Bool {
+        SyncPlayManager.shared.request(Paths.syncPlaySeek(.init(positionTicks: max(position, .zero).ticks)), from: self)
     }
 }

@@ -11,16 +11,24 @@ import AVFoundation
 import FactoryKit
 import SwiftUI
 
-extension Notification.Name {
+private extension Notification.Name {
 
-    /// Wird von `ContentGroupView` gesendet, sobald die erste Seite Inhalte (oder einen Fehler) zeigt.
-    static let nilumioStartseiteGeladen = Notification.Name("nilumioStartseiteGeladen")
+    static let nilumioHomeLoaded = Notification.Name("nilumioHomeLoaded")
 }
 
 extension View {
 
     func nilumioIntro() -> some View {
         modifier(NilumioIntro())
+    }
+
+    /// Für `ContentGroupView`: Sobald die Startseite fertig ist, darf das Intro ausblenden.
+    func nilumioReportHomeLoaded(_ isLoaded: Bool) -> some View {
+        onChange(of: isLoaded) { _, isLoaded in
+            if isLoaded {
+                NotificationCenter.default.post(name: .nilumioHomeLoaded, object: nil)
+            }
+        }
     }
 }
 
@@ -30,68 +38,77 @@ private struct NilumioIntro: ViewModifier {
     private var userSessionManager
 
     @State
-    private var sichtbar = true
+    private var isVisible = true
     @State
-    private var videoZuEnde = false
+    private var videoEnded = false
     @State
-    private var startseiteGeladen = false
+    private var homeLoaded = false
 
     func body(content: Content) -> some View {
         ZStack {
-            Color.nilumioGrund.ignoresSafeArea()
+            Color.nilumioBackground.ignoresSafeArea()
 
             content
 
-            if sichtbar {
-                IntroVideo { videoZuEnde = true }
-                    .background(Color.nilumioGrund)
+            if isVisible {
+                IntroVideo { videoEnded = true }
+                    .background(Color.nilumioBackground)
                     .ignoresSafeArea()
                     .transition(.opacity)
                     .zIndex(1)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .nilumioStartseiteGeladen)) { _ in
-            startseiteGeladen = true
+        .onReceive(NotificationCenter.default.publisher(for: .nilumioHomeLoaded)) { _ in
+            homeLoaded = true
         }
-        .onChange(of: videoZuEnde && (startseiteGeladen || userSessionManager.state == .signedOut)) { _, bereit in
-            if bereit { ausblenden() }
+        .onChange(of: videoEnded && (homeLoaded || userSessionManager.state == .signedOut)) { _, isReady in
+            if isReady {
+                hide()
+            }
         }
         .task {
             try? await Task.sleep(for: .seconds(15))
-            ausblenden()
+            hide()
         }
     }
 
-    private func ausblenden() {
-        withAnimation(.easeInOut(duration: 0.6)) { sichtbar = false }
+    private func hide() {
+        withAnimation(.easeInOut(duration: 0.6)) { isVisible = false }
     }
 }
 
 /// AVPlayerLayer ohne Bedienelemente; meldet das Videoende (oder fehlendes Video).
 private struct IntroVideo: UIViewRepresentable {
 
-    let zuEnde: () -> Void
+    let onEnd: () -> Void
 
     final class PlayerView: UIView {
-        override static var layerClass: AnyClass { AVPlayerLayer.self }
-        var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
-        var beobachter: NSObjectProtocol?
+        override static var layerClass: AnyClass {
+            AVPlayerLayer.self
+        }
+
+        var playerLayer: AVPlayerLayer {
+            layer as! AVPlayerLayer
+        }
+
+        var endObserver: NSObjectProtocol?
     }
 
     func makeUIView(context: Context) -> PlayerView {
         let view = PlayerView()
         guard let url = Bundle.main.url(forResource: "nilumio-intro", withExtension: "mp4") else {
-            DispatchQueue.main.async(execute: zuEnde)
+            DispatchQueue.main.async(execute: onEnd)
             return view
         }
+
         let player = AVPlayer(url: url)
         view.playerLayer.player = player
         view.playerLayer.videoGravity = .resizeAspect
-        view.beobachter = NotificationCenter.default.addObserver(
+        view.endObserver = NotificationCenter.default.addObserver(
             forName: AVPlayerItem.didPlayToEndTimeNotification,
             object: player.currentItem,
             queue: .main
-        ) { _ in zuEnde() }
+        ) { _ in onEnd() }
         player.play()
         return view
     }
@@ -100,6 +117,6 @@ private struct IntroVideo: UIViewRepresentable {
 
     static func dismantleUIView(_ uiView: PlayerView, coordinator: ()) {
         uiView.playerLayer.player?.pause()
-        if let beobachter = uiView.beobachter { NotificationCenter.default.removeObserver(beobachter) }
+        uiView.endObserver.map(NotificationCenter.default.removeObserver)
     }
 }

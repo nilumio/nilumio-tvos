@@ -339,10 +339,8 @@ extension VideoPlayer {
 
         func commitScrub() {
             guard isScrubbing else { return }
-            if SyncPlayManager.shared.requestSeek(scrubbedSeconds.value, manager: manager) { isScrubbing = false; scrubOriginSeconds = nil; return } // nilumio
 
-            manager?.proxy?.setSeconds(scrubbedSeconds.value)
-            manager?.setPlaybackRequestStatus(status: .playing)
+            manager?.nilumioSeekAndPlay(to: scrubbedSeconds.value) // nilumio
             isScrubbing = false
             scrubOriginSeconds = nil
         }

@@ -101,7 +101,7 @@ struct AboutAppView: View {
                 #endif
             }
 
-            NilumioHerkunftSection() // nilumio
+            NilumioOriginSection() // nilumio
         }
         .navigationTitle(L10n.aboutApp)
     }

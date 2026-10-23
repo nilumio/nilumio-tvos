@@ -10,7 +10,7 @@ import SwiftUI
 
 extension Color {
 
-    static let jellyfinPurple = Color.nilumioAkzent // nilumio: Türkis statt Jellyfin-Lila
+    static let jellyfinPurple = Color.nilumioAccent // nilumio: Türkis statt Jellyfin-Lila
 
     var uiColor: UIColor {
         UIColor(self)

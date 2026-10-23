@@ -1,5 +1,5 @@
 //
-// nilumio – „Gemeinsam schauen“ (Jellyfin SyncPlay) für tvOS.
+// nilumio – SyncPlay (Jellyfin SyncPlay) für tvOS.
 // Neu geschrieben nach dem öffentlich dokumentierten Jellyfin-API (OpenAPI:
 // /SyncPlay/*, /GetUtcTime, WebSocket-Nachrichten SyncPlayCommand/SyncPlayGroupUpdate).
 // Endpunkte, Datentypen und WebSocket kommen aus dem Jellyfin Swift SDK.

@@ -19,7 +19,7 @@ To see every change in detail: `git diff 04e0aa10..HEAD` or `git log 04e0aa10..H
 | Start-up intro | Intro video that fades into the app once the home screen has loaded | `Shared/Nilumio/NilumioIntro.swift`, `Swiftfin tvOS/Resources/nilumio-intro.mp4`, `Swiftfin tvOS/App/SwiftfinApp.swift`, `Shared/Views/ContentGroupView.swift` |
 | About and settings | Origin and licence notice under About; app icon picker hidden on tvOS (alternative icons show the Jellyfin logo) | `Shared/Views/AboutAppView.swift`, `Shared/Views/AppSettingsView.swift` |
 | British English | New `en-GB` strings (colour, favourite, licence) | `Translations/en-GB.lproj/Localizable.strings` |
-| Watch together (SyncPlay) | Groups, clock sync and server commands in the player, written against the public Jellyfin API | `Shared/Nilumio/SyncPlay/`, `Shared/Coordinators/Tabs/MainTabView.swift`, `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift`, `Shared/Views/VideoPlayer/Container/*`, `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` |
+| SyncPlay (SyncPlay) | Groups, clock sync and server commands in the player, written against the public Jellyfin API | `Shared/Nilumio/SyncPlay/`, `Shared/Coordinators/Tabs/MainTabView.swift`, `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift`, `Shared/Views/VideoPlayer/Container/*`, `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` |
 | Docs and repository | Fork documentation, issue templates, ignore rules | `README.md`, `NOTICE.md`, `NILUMIO_CHANGES.md`, `THIRD_PARTY_NOTICES.md`, `CONTRIBUTING.md`, `SECURITY.md`, `docs/`, `.github/ISSUE_TEMPLATE/`, `.gitignore` |
 
 ## All added, modified, removed and renamed files

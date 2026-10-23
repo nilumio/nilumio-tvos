@@ -20,8 +20,8 @@ the free Jellyfin client made by the Jellyfin community.
 |---|---|
 | `Shared/Nilumio/Nilumio.swift` | Colours (turquoise #22ABD8, purple #4B3DB8, background #070A12), source notice for "About" |
 | `Shared/Nilumio/NilumioIntro.swift` | Start-up animation (video with soft cross-fade) |
-| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | "Watch together" (Jellyfin SyncPlay): groups, clock sync, server commands in the player |
-| `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | "Watch together" page and menu entry |
+| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | SyncPlay: groups, clock sync, server commands in the player |
+| `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | "SyncPlay" page and menu entry |
 | `Swiftfin tvOS/Resources/nilumio-intro.mp4` | Intro video |
 | `Swiftfin tvOS/Resources/Assets.xcassets/LaunchScreenBackground.colorset` | Launch screen colour #070A12 |
 | `Translations/en-GB.lproj/Localizable.strings` | British spelling (colour, favourite, licence …) |
@@ -52,14 +52,14 @@ Every change in code is marked with `// nilumio`.
 | `Swiftfin tvOS/Components/ColorPicker/ColorPickerDefaults.swift` | Colour preset named "nilumio" instead of "Jellyfin" |
 | `Swiftfin tvOS/Resources/Assets.xcassets/App Icon & Top Shelf Image.brandassets/**` | App icon layers and top shelf images replaced |
 | `Shared/Resources/Assets.xcassets/jellyfin-blob-blue.imageset/*` | Jellyfin logo replaced by the nilumio mark (asset name unchanged) |
-| `Shared/Coordinators/Tabs/MainTabView.swift` | "Watch together" menu entry (tvOS) |
+| `Shared/Coordinators/Tabs/MainTabView.swift` | "SyncPlay" menu entry (tvOS) |
 | `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift` | `playItem` no longer `private` (SyncPlay starts the group's item through it) |
 | `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | Remote play/pause goes through `nilumioSetPlayback` (a request to the server when in a group) |
 | `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | Scrubbing sent to the server as a request when in a group |
 | `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | Skipping forward/back sent to the server as a request when in a group |
 | `README.md` | nilumio section at the top |
 
-## SyncPlay ("Watch together") and licensing
+## SyncPlay ("SyncPlay") and licensing
 
 Swiftfin has no SyncPlay (issue jellyfin/Swiftfin#688). The implementation in `Shared/Nilumio/SyncPlay/`
 was written from scratch against the public Jellyfin API (OpenAPI: `/SyncPlay/*`, `/GetUtcTime`,

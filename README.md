@@ -8,7 +8,7 @@
 What nilumio adds on top of Swiftfin:
 
 - its own name, app icon, top shelf images and colours, and a short start-up intro
-- *Watch together*: synchronised playback with Jellyfin SyncPlay groups, also together with Jellyfin Web or Android
+- *SyncPlay*: synchronised playback with Jellyfin SyncPlay groups, also together with Jellyfin Web or Android
 - British English texts (colour, favourite, licence)
 
 nilumio is not an official Jellyfin product and does not use the Jellyfin or Swiftfin logos. Website: [nilumio.com](https://nilumio.com)
@@ -42,9 +42,9 @@ On a real Apple TV: open the scheme "Swiftfin tvOS" in Xcode, choose your own te
 Signing & Capabilities (or create `XcodeConfig/DevelopmentTeam.xcconfig` with
 `DEVELOPMENT_TEAM = …`; the file is ignored by git) and select the paired Apple TV as the destination.
 
-## Watch together (SyncPlay)
+## SyncPlay (SyncPlay)
 
-The menu entry *Watch together* creates or joins a SyncPlay group, also with Jellyfin Web,
+The menu entry *SyncPlay* creates or joins a SyncPlay group, also with Jellyfin Web,
 Android and other clients. In a group, pause, play and seeking are sent to the server as
 requests; the server's command is then carried out on every device at the same server time.
 Whoever starts something in the group starts it for everyone. SyncPlay must be allowed for

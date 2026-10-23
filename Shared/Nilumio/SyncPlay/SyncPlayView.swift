@@ -1,5 +1,5 @@
 //
-// nilumio – Seite „Gemeinsam schauen“ (Jellyfin SyncPlay) und ihr Menüpunkt.
+// nilumio – Seite SyncPlay (Jellyfin SyncPlay) und ihr Menüpunkt.
 // Steht wie das übrige Projekt unter der Mozilla Public License 2.0.
 //
 // Copyright (c) 2026 Niklas Held
@@ -16,7 +16,7 @@ extension TabItem {
 
     static var syncPlay: TabItem {
         _ = SyncPlayManager.shared // Gruppen-Nachrichten ab App-Start empfangen
-        return TabItem(id: "nilumio-syncplay", title: t("Gemeinsam schauen", "Watch together"), systemImage: "person.2") {
+        return TabItem(id: "nilumio-syncplay", title: t("SyncPlay", "SyncPlay"), systemImage: "person.2") {
             SyncPlayView()
         }
     }
@@ -66,7 +66,7 @@ struct SyncPlayView: View {
                 Text(fehler).foregroundStyle(.red)
             }
         }
-        .navigationTitle(t("Gemeinsam schauen", "Watch together"))
+        .navigationTitle(t("SyncPlay", "SyncPlay"))
         .task { await syncPlay.laden() }
         .onChange(of: syncPlay.group?.groupID) { Task { await syncPlay.laden() } }
     }

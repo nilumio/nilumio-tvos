@@ -20,8 +20,7 @@ enum SyncPlayClockTests {
         clock.add(sent: t0, serverReceived: t0 + 5.1, serverSent: t0 + 5.3, received: t0 + 0.4)
         check(clock.offset, 5, "Versatz")
         check(clock.roundTrip, 0.2, "Laufzeit ohne Bearbeitung")
-        check(clock.serverTime(at: t0).timeIntervalSince(t0), 5, "Serverzeit")
-        check(clock.localTime(at: t0 + 5).timeIntervalSince(t0), 0, "lokale Zeit")
+        check(clock.serverNow.timeIntervalSinceNow, 5, "Serverzeit", tolerance: 0.01)
 
         // Eine langsamere Messung mit anderem Versatz ändert nichts, eine schnellere gilt sofort.
         clock.add(sent: t0, serverReceived: t0 + 6, serverSent: t0 + 6, received: t0 + 1)
@@ -45,8 +44,8 @@ enum SyncPlayClockTests {
 
     nonisolated(unsafe) static var failures = 0
 
-    static func check<T: BinaryFloatingPoint>(_ actual: T, _ expected: T, _ name: String) {
-        if abs(actual - expected) > 1e-6 {
+    static func check(_ actual: Double, _ expected: Double, _ name: String, tolerance: Double = 1e-6) {
+        if abs(actual - expected) > tolerance {
             failures += 1
             print("FEHLER \(name): \(actual) statt \(expected)")
         }

@@ -25,11 +25,7 @@ struct SyncPlayClock {
         (self.roundTrip, self.offset) = samples.min { $0.roundTrip < $1.roundTrip }!
     }
 
-    func serverTime(at localTime: Date = Date()) -> Date {
-        localTime.addingTimeInterval(offset)
-    }
-
-    func localTime(at serverTime: Date) -> Date {
-        serverTime.addingTimeInterval(-offset)
+    var serverNow: Date {
+        Date().addingTimeInterval(offset)
     }
 }

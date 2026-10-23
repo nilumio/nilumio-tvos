@@ -172,7 +172,7 @@ final class SyncPlayManager: ObservableObject {
 
         var startTicks = queue.startPositionTicks ?? 0
         if queue.isPlaying == true, let lastUpdate = queue.lastUpdate {
-            startTicks += Int(clock.serverTime().timeIntervalSince(lastUpdate) * 10_000_000)
+            startTicks += Int(clock.serverNow.timeIntervalSince(lastUpdate) * 10_000_000)
         }
         if player?.playbackItem?.baseItem.id != itemID || !sessionManager.hasActivePlayback {
             report(isReady: false, ticks: startTicks)
@@ -201,7 +201,7 @@ final class SyncPlayManager: ObservableObject {
     private func handle(_ command: SendCommand) {
         guard group != nil, command.playlistItemID == nil || command.playlistItemID == playingItem?.playlistItemID else { return }
 
-        let localTime = clock.localTime(at: command.when ?? clock.serverTime())
+        let localTime = (command.when ?? clock.serverNow).addingTimeInterval(-clock.offset)
         commandTask?.cancel()
         commandTask = Task { [weak self] in
             let delay = localTime.timeIntervalSinceNow
@@ -245,7 +245,7 @@ final class SyncPlayManager: ObservableObject {
             isPlaying: false,
             playlistItemID: playingItem?.playlistItemID,
             positionTicks: ticks,
-            when: clock.serverTime()
+            when: clock.serverNow
         )
         send(isReady ? Paths.syncPlayReady(info) : Paths.syncPlayBuffering(info))
     }

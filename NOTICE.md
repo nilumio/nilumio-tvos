@@ -20,13 +20,15 @@ the free Jellyfin client made by the Jellyfin community.
 |---|---|
 | `Shared/Nilumio/Nilumio.swift` | Colours (turquoise #22ABD8, purple #4B3DB8, background #070A12), source notice for "About" |
 | `Shared/Nilumio/NilumioIntro.swift` | Start-up animation (video with soft cross-fade) |
-| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | SyncPlay: groups, clock sync, server commands in the player |
+| `Shared/Nilumio/SyncPlay/SyncPlayManager.swift` | SyncPlay: groups, server commands in the player, player input as requests to the server |
+| `Shared/Nilumio/SyncPlay/SyncPlayClock.swift` | SyncPlay clock sync with the server (NTP method) |
 | `Shared/Nilumio/SyncPlay/SyncPlayView.swift` | "SyncPlay" page and menu entry |
 | `Swiftfin tvOS/Resources/nilumio-intro.mp4` | Intro video |
 | `Swiftfin tvOS/Resources/Assets.xcassets/LaunchScreenBackground.colorset` | Launch screen colour #070A12 |
 | `Translations/en-GB.lproj/Localizable.strings` | British spelling (colour, favourite, licence …) |
 | `NOTICE.md` | this file |
 | `docs/screenshots/` | Simulator screenshots |
+| `Tests/Nilumio/SyncPlayClockTests.swift` | Tests for the clock sync (run with `swiftc`, see the file header) |
 
 nilumio's images and video (icons, top shelf, intro) are not covered by the MPL;
 all rights reserved.
@@ -55,8 +57,8 @@ Every change in code is marked with `// nilumio`.
 | `Shared/Coordinators/Tabs/MainTabView.swift` | "SyncPlay" menu entry (tvOS) |
 | `Shared/Services/UserSession/UserSessionManager+SocketCommands.swift` | `playItem` no longer `private` (SyncPlay starts the group's item through it) |
 | `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | Remote play/pause goes through `nilumioSetPlayback` (a request to the server when in a group) |
-| `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | Scrubbing sent to the server as a request when in a group |
-| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | Skipping forward/back sent to the server as a request when in a group |
+| `Shared/Views/VideoPlayer/Container/VideoPlayer+ViewState.swift` | Scrubbing goes through `nilumioSeekAndPlay` (a request to the server when in a group) |
+| `Swiftfin tvOS/Views/VideoPlayer/PlaybackControls/Components/PlaybackControls+Scrubbing.swift` | Skipping forward/back goes through `nilumioJump` (a request to the server when in a group) |
 | `README.md` | nilumio section at the top |
 
 ## SyncPlay ("SyncPlay") and licensing

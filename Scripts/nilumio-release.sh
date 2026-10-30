@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # nilumio: Apple-TV-Build archivieren und zu App Store Connect hochladen.
 # Aufruf: Scripts/nilumio-release.sh <Version> <Build>   z. B. Scripts/nilumio-release.sh 1.0.0 3
-# Voraussetzung: Xcode mit dem Entwicklerkonto angemeldet, XcodeConfig/DevelopmentTeam.xcconfig gesetzt.
+# Voraussetzung: XcodeConfig/DevelopmentTeam.xcconfig gesetzt, Zertifikat „Apple Distribution“ im Schlüsselbund,
+# Profil „nilumio tvOS App Store“ installiert und ~/.appstoreconnect/nilumio.env mit ASC_KEY_ID/ASC_ISSUER_ID
+# (API-Schlüssel, Rolle App-Manager, unter ~/.appstoreconnect/private_keys/AuthKey_<ID>.p8).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 VERSION=${1:?Version fehlt}; BUILD=${2:?Build-Nummer fehlt}
@@ -30,9 +32,14 @@ cat > "$OUT/ExportOptions.plist" <<PLIST
 <key>method</key><string>app-store-connect</string>
 <key>destination</key><string>upload</string>
 <key>teamID</key><string>$TEAM</string>
-<key>signingStyle</key><string>automatic</string>
+<key>signingStyle</key><string>manual</string>
+<key>signingCertificate</key><string>Apple Distribution</string>
+<key>provisioningProfiles</key><dict><key>com.held0.nilumio</key><string>nilumio tvOS App Store</string></dict>
 </dict></plist>
 PLIST
+# shellcheck disable=SC1090
+source ~/.appstoreconnect/nilumio.env
 xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist "$OUT/ExportOptions.plist" \
-  -exportPath "$OUT/export" -allowProvisioningUpdates
+  -exportPath "$OUT/export" -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_"$ASC_KEY_ID".p8 \
+  -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
 echo "Hochgeladen: $VERSION ($BUILD)"
